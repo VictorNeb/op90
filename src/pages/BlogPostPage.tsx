@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { getPost, type NotionPost } from '@/lib/notion';
 import { formatDate } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import { ArrowLeft, Calendar, User2 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 
@@ -65,14 +63,6 @@ const BlogPostPage = () => {
 
   const featuredImage = post.thumbnail;
 
-  // Ensure content is a string before passing to ReactMarkdown
-  const processedContent = post.content && typeof post.content === 'string' 
-    ? post.content 
-    : 'No content available';
-
-  // Debug log to confirm the value of processedContent
-  console.log('Processed content for ReactMarkdown:', processedContent);
-
   return (
     <div className="min-h-screen pt-32 pb-16">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,44 +95,13 @@ const BlogPostPage = () => {
             <div className="relative h-[400px] mb-8 rounded-2xl overflow-hidden">
               <img
                 src={featuredImage}
-                alt={post.title}
+                alt={post.title.rendered}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           )}
 
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              // Allow raw HTML (e.g., for <details><summary> tags)
-              details: ({ children }) => <details>{children}</details>,
-              summary: ({ children }) => <summary>{children}</summary>,
-              // Custom styles for other elements
-              p: ({ node, ...props }) => <p className="mb-4 text-white/80 leading-relaxed" {...props} />,
-              a: ({ node, ...props }) => (
-                <a
-                  {...props}
-                  className="text-cyan-400 no-underline hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              ),
-              code: ({ node, inline, className, children, ...props }) => {
-                const match = /language-(\w+)/.exec(className || '');
-                return !inline ? (
-                  <pre className="bg-white/5 p-4 rounded-lg overflow-x-auto">
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  </pre>
-                ) : (
-                  <code className="text-cyan-400" {...props}>
-                    {children}
-                  </code>
-                );
-              },
-            }}
             className="prose prose-invert prose-cyan max-w-none
                      prose-headings:text-white prose-headings:font-semibold
                      prose-p:text-white/80 prose-p:leading-relaxed
@@ -153,8 +112,7 @@ const BlogPostPage = () => {
                      prose-ol:text-white/80 prose-ul:text-white/80
                      prose-li:marker:text-cyan-400"
           >
-            {processedContent}
-          </ReactMarkdown>
+            {post.content}</ReactMarkdown>
         </motion.div>
       </article>
     </div>
