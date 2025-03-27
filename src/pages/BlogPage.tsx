@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Component, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { getPosts, type NotionPost } from '@/lib/notion';
 import { BlogCard } from '@/components/blog/BlogCard';
@@ -7,6 +7,34 @@ import { ShimmerText } from '@/components/ui/shimmer-text';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 const POSTS_PER_PAGE = 9;
+
+// Error Boundary Component
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error in BlogPage:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+          <h3 className="text-xl font-semibold mb-2 text-red-400">Something went wrong</h3>
+          <p className="text-white/60 max-w-md">
+            An error occurred while rendering the blog posts. Please try again later.
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const BlogPage = () => {
   const [posts, setPosts] = useState<NotionPost[]>([]);
@@ -65,7 +93,7 @@ const BlogPage = () => {
             </p>
           </div>
         ) : (
-          <>
+          <ErrorBoundary>
             {posts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {posts.map((post) => (
@@ -95,7 +123,7 @@ const BlogPage = () => {
                 onPageChange={setCurrentPage}
               />
             )}
-          </>
+          </ErrorBoundary>
         )}
       </div>
     </div>
