@@ -21,24 +21,11 @@ export async function getPosts(page = 1, pageSize = 10): Promise<{
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch blog posts: ${response.status} ${response.statusText}`);
+      throw new Error('Failed to fetch blog posts');
     }
     
     const data = await response.json();
-    console.log('Fetched blog posts data:', data); // Debug log
-    
-    const allPosts = data.posts || [];
-    if (!Array.isArray(allPosts)) {
-      throw new Error('Invalid blog posts data: posts is not an array');
-    }
-
-    // Validate that each post has a content field
-    allPosts.forEach((post, index) => {
-      if (!post.content || typeof post.content !== 'string') {
-        console.warn(`Post at index ${index} has invalid content:`, post);
-        post.content = 'No content available'; // Fallback
-      }
-    });
+    const allPosts = data.posts;
     
     // Calculate pagination
     const startIndex = (page - 1) * pageSize;
@@ -63,23 +50,11 @@ export async function getPost(slug: string): Promise<NotionPost | null> {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch blog posts: ${response.status} ${response.statusText}`);
+      throw new Error('Failed to fetch blog posts');
     }
     
     const data = await response.json();
-    console.log('Fetched blog posts data for single post:', data); // Debug log
-    
-    const allPosts = data.posts || [];
-    if (!Array.isArray(allPosts)) {
-      throw new Error('Invalid blog posts data: posts is not an array');
-    }
-
-    const post = allPosts.find((p: NotionPost) => p.slug === slug);
-    
-    if (post && (!post.content || typeof post.content !== 'string')) {
-      console.warn(`Post with slug ${slug} has invalid content:`, post);
-      post.content = 'No content available'; // Fallback
-    }
+    const post = data.posts.find((p: NotionPost) => p.slug === slug);
     
     return post || null;
   } catch (error) {
