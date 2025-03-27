@@ -11,11 +11,6 @@ interface BlogCardProps {
 export function BlogCard({ post }: BlogCardProps) {
   const featuredImage = post.thumbnail;
 
-  // Ensure the content preview is a string
-  const contentPreview = post.content && typeof post.content === 'string' 
-    ? post.content.split('\n\n')[0] 
-    : 'No content available';
-
   return (
     <Link to={`/blog/${post.slug}`} className="group block">
       <article className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:bg-white/10">
@@ -42,7 +37,7 @@ export function BlogCard({ post }: BlogCardProps) {
           </h2>
           
           <div className="text-white/70 line-clamp-3 mb-4">
-            {contentPreview}
+            {post.content.split('\n')[0]}
           </div>
           
           <div className="flex items-center text-cyan-400 font-medium">
